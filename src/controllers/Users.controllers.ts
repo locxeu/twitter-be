@@ -2,13 +2,17 @@ import { NextFunction, Request, Response } from 'express'
 import { ObjectId } from 'mongodb'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/userMessage'
-import { LogoutRequestBody, RegisterRequestBody, TokenPayload } from '~/models/request/User.request'
+import {
+  LogoutRequestBody,
+  RegisterRequestBody,
+  TokenPayload,
+  UpdateProfileRequestBody
+} from '~/models/request/User.request'
 import databaseService from '~/services/database.services'
 import usersService from '~/services/users.rervices'
 
 export const loginController = async (req: Request, res: Response, next: NextFunction) => {
   const { user }: any = req
-  console.log('user', user)
   const user_id = user._id as ObjectId
   const result = await usersService.login({ user_id: user_id.toString(), verify: user.verifyStatus })
   return res.json({
@@ -72,11 +76,17 @@ export const profileController = async (req: Request, res: Response, next: NextF
   })
 }
 
-export const updateProfileController = async (req: Request, res: Response, next: NextFunction) => {
-  // const { user_id } = req.decoded_authorization as TokenPayload
-  // const result = await usersService.getMe(user_id)
+export const updateProfileController = async (
+  req: Request<any, any, UpdateProfileRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { body } = req
+  console.log('body', body)
+  const result = usersService.updateProfile(user_id, body)
   return res.json({
     message: 'Success',
-    // result
+    result
   })
 }

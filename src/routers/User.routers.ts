@@ -7,6 +7,7 @@ import {
   registerController,
   updateProfileController
 } from '~/controllers/Users.controllers'
+import { filterMiddlewares } from '~/middlewares/common.middlewares'
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
@@ -16,6 +17,7 @@ import {
   updateProfileValidator,
   verifyUserValidator
 } from '~/middlewares/user.middlewares'
+import { UpdateProfileRequestBody } from '~/models/request/User.request'
 import { wrapRequestHandler } from '~/utils/handlers'
 import { validate } from '~/utils/validation'
 
@@ -83,6 +85,15 @@ usersRouter.patch(
   validate(accessTokenValidator),
   verifyUserValidator,
   validate(updateProfileValidator),
+  filterMiddlewares<UpdateProfileRequestBody>([
+    'name',
+    'email',
+    'date_of_birth',
+    'location',
+    'website',
+    'avatar',
+    'cover_photo'
+  ]),
   wrapRequestHandler(updateProfileController)
 )
 

@@ -36,6 +36,20 @@ const nameSchema: ParamSchema = {
   trim: true
 }
 
+const imageSchema: ParamSchema = {
+  optional: true,
+  isString: {
+    errorMessage: USER_MESSAGES.IMAGE_MUST_BE_STRING
+  },
+  isLength: {
+    options: {
+      min: 2,
+      max: 400
+    }
+  },
+  trim: true
+}
+
 export const loginValidator = checkSchema({
   email: {
     notEmpty: {
@@ -150,7 +164,6 @@ export const accessTokenValidator = checkSchema(
             secretOrPublicKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
           })
           console.log(decoded_authorization, 'value decoded_authorization')
-
           ;(req as Request & { decoded_authorization: any }).decoded_authorization = decoded_authorization
           return true
         }
@@ -232,7 +245,19 @@ export const updateProfileValidator = checkSchema(
       ...dateOfBirthSchema,
       optional: true,
       notEmpty: undefined
-    }
+    },
+    location: {
+      isString: {
+        errorMessage: USER_MESSAGES.LOCATION_MUST_BE_STRING
+      }
+    },
+    website: {
+      isString: {
+        errorMessage: USER_MESSAGES.WEBSITE_MUST_BE_STRING
+      }
+    },
+    avatar: imageSchema,
+    cover_photo: imageSchema
   },
   ['body']
 )

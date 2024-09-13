@@ -1,6 +1,6 @@
 import User from '~/models/schemas/User.schemas'
 import databaseService from './database.services'
-import { RegisterRequestBody } from '~/models/request/User.request'
+import { RegisterRequestBody, UpdateProfileRequestBody } from '~/models/request/User.request'
 import { signToken } from '~/utils/jwt'
 import { TokenType, UserVerifyStatus } from '~/constants/enums'
 import RefreshToken from '~/models/schemas/RefreshToken.schemas'
@@ -153,6 +153,24 @@ class UsersService {
     return {
       result
     }
+  }
+  async updateProfile(user_id: string, payload: UpdateProfileRequestBody) {
+    const _payload = payload.date_of_birth ? { ...payload, date_of_birth: new Date(payload.date_of_birth) } : payload
+    const result = await databaseService.users.findOneAndUpdate(
+      {
+        _id: new ObjectId(user_id)
+      },
+      {
+        $set: {
+          ...(_payload as UpdateProfileRequestBody & { date_of_birth?: Date })
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      }
+    )
+    console.log('result', result)
+    return result
   }
 }
 

@@ -17,5 +17,8 @@ export const USER_MESSAGES = {
   REFRESH_TOKEN_IS_INVALID: 'Refresh token is invalid',
   LOGOUT_SUCCESS: 'Logout success',
   EMAIL_VERIFY_SUCCESS: 'email_verify_success',
-  USER_NOT_VERIFIED: 'User not verified'
+  USER_NOT_VERIFIED: 'User not verified',
+  IMAGE_MUST_BE_STRING: 'Image must be a string',
+  LOCATION_MUST_BE_STRING: 'Location must be a string',
+  WEBSITE_MUST_BE_STRING: 'Website must be a string',
 }
