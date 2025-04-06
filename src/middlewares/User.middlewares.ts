@@ -3,12 +3,13 @@ import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/userMessage'
 import { ErrorWithStatus } from '~/models/error'
 import databaseService from '~/services/database.services'
-import usersService from '~/services/users.rervices'
+import usersService from '~/services/users.services'
 import { verifyToken } from '~/utils/jwt'
 import { NextFunction, Request, Response } from 'express'
 import { TokenPayload } from '~/models/request/User.request'
 import { UserVerifyStatus } from '~/constants/enums'
 import { validate } from '~/utils/validation'
+import { ObjectId } from 'mongodb'
 
 const dateOfBirthSchema: ParamSchema = {
   isISO8601: {
@@ -48,6 +49,26 @@ const imageSchema: ParamSchema = {
     }
   },
   trim: true
+}
+
+const userIdSchema: ParamSchema = {
+  custom: {
+    options: async (value, { req }) => {
+      if (!ObjectId.isValid(value)) {
+        throw new ErrorWithStatus({
+          messages: USER_MESSAGES.INVALID_USER_ID,
+          status: HTTP_STATUS.NOT_FOUND
+        })
+      }
+      const user = await databaseService.users.findOne({ _id: new ObjectId(value) })
+      if (user === null) {
+        throw new ErrorWithStatus({
+          messages: USER_MESSAGES.USER_NOT_FOUND,
+          status: HTTP_STATUS.NOT_FOUND
+        })
+      }
+    }
+  }
 }
 
 export const loginValidator = checkSchema({
@@ -163,7 +184,7 @@ export const accessTokenValidator = checkSchema(
             token: access_token,
             secretOrPublicKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
           })
-          console.log(decoded_authorization, 'value decoded_authorization')
+          // console.log(decoded_authorization, 'value decoded_authorization')
           ;(req as Request & { decoded_authorization: any }).decoded_authorization = decoded_authorization
           return true
         }
@@ -239,7 +260,18 @@ export const updateProfileValidator = checkSchema(
     name: {
       ...nameSchema,
       optional: true,
-      notEmpty: undefined
+      notEmpty: undefined,
+      custom: {
+        options: async (value, { req }) => {
+          const user = await databaseService.users.findOne({ name: value })
+          if (user) {
+            throw new ErrorWithStatus({
+              messages: USER_MESSAGES.NAME_ALREADY_EXISTS,
+              status: HTTP_STATUS.BAD_REQUEST
+            })
+          }
+        }
+      }
     },
     date_of_birth: {
       ...dateOfBirthSchema,
@@ -264,8 +296,6 @@ export const updateProfileValidator = checkSchema(
 
 export const verifyUserValidator = async (req: Request, res: Response, next: NextFunction) => {
   const { verify } = req.decoded_authorization as TokenPayload
-  console.log(verify, 'verifyUserValidator')
-  // console.log(req, 'req')
 
   if (verify !== UserVerifyStatus.Verified) {
     return next(
@@ -277,3 +307,17 @@ export const verifyUserValidator = async (req: Request, res: Response, next: Nex
   }
   next()
 }
+
+export const followUserValidator = checkSchema(
+  {
+    follow_user_id: userIdSchema
+  },
+  ['body']
+)
+
+export const unFollowUserValidator = checkSchema(
+  {
+    user_id: userIdSchema
+  },
+  ['params']
+)

@@ -3,6 +3,7 @@ export const USER_MESSAGES = {
   NAME_IS_REQUIRED: 'Name is required',
   NAME_MUST_BE_STRING: 'Name must be a string',
   NAME_LENGTH_MUST_BE_MORE_THAN_3: 'Name length must be more than 3',
+  NAME_ALREADY_EXISTS: 'Name already exists',
   EMAIL_ALREADY_EXISTS: 'Email already exists',
   EMAIL_IS_REQUIRED: 'Email is required',
   EMAIL_IS_INVALID: 'Email is invalid',
@@ -21,4 +22,9 @@ export const USER_MESSAGES = {
   IMAGE_MUST_BE_STRING: 'Image must be a string',
   LOCATION_MUST_BE_STRING: 'Location must be a string',
   WEBSITE_MUST_BE_STRING: 'Website must be a string',
+  INVALID_USER_ID: 'Invalid user id',
+  FOLLOW_SUCCESS: 'Follow success',
+  UNFOLLOW_SUCCESS: 'Unfollow success',
+  ALREADY_FOLLOWING: 'Already following',
+  ALREADY_UNFOLLOWING: 'Already unfollowing',
 }

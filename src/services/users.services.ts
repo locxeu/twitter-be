@@ -4,6 +4,7 @@ import { RegisterRequestBody, UpdateProfileRequestBody } from '~/models/request/
 import { signToken } from '~/utils/jwt'
 import { TokenType, UserVerifyStatus } from '~/constants/enums'
 import RefreshToken from '~/models/schemas/RefreshToken.schemas'
+import Follower from '~/models/schemas/Followers.schemas'
 import { ObjectId } from 'mongodb'
 import { USER_MESSAGES } from '~/constants/userMessage'
 
@@ -169,8 +170,49 @@ class UsersService {
         }
       }
     )
-    console.log('result', result)
     return result
+  }
+
+  async follow(user_id: string, followed_user_id: string) {
+    const follower = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+    if (follower) {
+      return {
+        message: USER_MESSAGES.ALREADY_FOLLOWING
+      }
+    }
+    await databaseService.followers.insertOne(
+      new Follower({
+        user_id: new ObjectId(user_id),
+        followed_user_id: new ObjectId(followed_user_id)
+      })
+    )
+
+    return {
+      message: USER_MESSAGES.FOLLOW_SUCCESS
+    }
+  }
+
+  async unfollow(user_id: string, followed_user_id: string) {
+    const follower = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+    if (!follower) {
+      return {
+        message: USER_MESSAGES.ALREADY_UNFOLLOWING
+      }
+    }
+    await databaseService.followers.deleteOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+
+    return {
+      message: USER_MESSAGES.UNFOLLOW_SUCCESS
+    }
   }
 }
 

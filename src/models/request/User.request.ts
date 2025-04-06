@@ -32,3 +32,11 @@ export interface UpdateProfileRequestBody {
   avatar?: string
   cover_photo?: string
 }
+
+export interface FollowUserRequestBody {
+  followed_user_id: string
+}
+
+export interface UnfollowUserRequestParams {
+  follow_user_id: string
+}

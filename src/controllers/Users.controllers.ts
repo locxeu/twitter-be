@@ -3,13 +3,15 @@ import { ObjectId } from 'mongodb'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/userMessage'
 import {
+  FollowUserRequestBody,
   LogoutRequestBody,
   RegisterRequestBody,
   TokenPayload,
+  UnfollowUserRequestParams,
   UpdateProfileRequestBody
 } from '~/models/request/User.request'
 import databaseService from '~/services/database.services'
-import usersService from '~/services/users.rervices'
+import usersService from '~/services/users.services'
 
 export const loginController = async (req: Request, res: Response, next: NextFunction) => {
   const { user }: any = req
@@ -83,10 +85,31 @@ export const updateProfileController = async (
 ) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const { body } = req
-  console.log('body', body)
   const result = usersService.updateProfile(user_id, body)
   return res.json({
     message: 'Success',
     result
   })
+}
+
+export const followController = async (
+  req: Request<any, any, FollowUserRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { followed_user_id } = req.body
+  const result = await usersService.follow(user_id, followed_user_id)
+  return res.json(result)
+}
+
+export const unfollowController = async (
+  req: Request<any, any, UnfollowUserRequestParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { follow_user_id } = req.params
+  const result = await usersService.unfollow(user_id, follow_user_id)
+  return res.json(result)
 }

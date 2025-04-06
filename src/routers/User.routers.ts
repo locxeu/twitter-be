@@ -1,19 +1,23 @@
 import { Router } from 'express'
 import {
   emailVerifyController,
+  followController,
   loginController,
   logoutController,
   profileController,
   registerController,
+  unfollowController,
   updateProfileController
 } from '~/controllers/Users.controllers'
 import { filterMiddlewares } from '~/middlewares/common.middlewares'
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
+  followUserValidator,
   loginValidator,
   refreshTokenValidator,
   registerValidator,
+  unFollowUserValidator,
   updateProfileValidator,
   verifyUserValidator
 } from '~/middlewares/user.middlewares'
@@ -95,6 +99,35 @@ usersRouter.patch(
     'cover_photo'
   ]),
   wrapRequestHandler(updateProfileController)
+)
+
+/**
+ * Description: Follow user
+ * Path: /follow
+ * Method: POST
+ * Body: {follow_user_id:string}
+ */
+usersRouter.post(
+  '/follow',
+  validate(accessTokenValidator),
+  verifyUserValidator,
+  followUserValidator,
+  wrapRequestHandler(followController)
+)
+
+/**
+ * Description: Unfollow user
+ * Path: /follow/:follow_user_id
+ * Method: DELETE
+ * Params: {follow_user_id:string}
+ */
+
+usersRouter.delete(
+  '/follow/:follow_user_id',
+  validate(accessTokenValidator),
+  verifyUserValidator,
+  unFollowUserValidator,
+  wrapRequestHandler(unfollowController)
 )
 
 export default usersRouter

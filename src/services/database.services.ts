@@ -2,11 +2,11 @@ import { Collection, Db, MongoClient, ServerApiVersion } from 'mongodb'
 import dotenv from 'dotenv'
 import User from '~/models/schemas/User.schemas'
 import RefreshToken from '~/models/schemas/RefreshToken.schemas'
+import Follower from '~/models/schemas/Followers.schemas'
 dotenv.config()
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@twitter-dev.yrlwgyq.mongodb.net/?retryWrites=true&w=majority`
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
-console.log('uri', uri)
 class DatabaseService {
   private client: MongoClient
   private db: Db
@@ -22,15 +22,18 @@ class DatabaseService {
       console.log('Pinged your deployment. You successfully connected to MongoDB!')
     } finally {
       // Ensures that the client will close when you finish/error
-    //   await this.client.close()
+      //   await this.client.close()
     }
   }
 
   get users(): Collection<User> {
-    return this.db.collection(process.env.DB_USERS_COLLECTION as string )
+    return this.db.collection(process.env.DB_USERS_COLLECTION as string)
   }
   get refreshToken(): Collection<RefreshToken> {
     return this.db.collection(process.env.DB_REFRESH_TOKEN_COLLECTION as string)
+  }
+  get followers(): Collection<Follower> {
+    return this.db.collection(process.env.DB_FOLLOWERS_COLLECTION as string)
   }
 }
 const databaseService = new DatabaseService()
